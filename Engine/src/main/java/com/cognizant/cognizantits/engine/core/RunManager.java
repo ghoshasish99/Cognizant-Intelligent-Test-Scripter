@@ -17,6 +17,7 @@ package com.cognizant.cognizantits.engine.core;
 
 import com.cognizant.cognizantits.datalib.component.ExecutionStep;
 import com.cognizant.cognizantits.datalib.component.TestSet;
+import com.cognizant.cognizantits.engine.cli.LookUp;
 import com.cognizant.cognizantits.engine.constants.FilePath;
 import com.cognizant.cognizantits.engine.drivers.WebDriverFactory.Browser;
 import com.cognizant.cognizantits.engine.settings.GlobalSettings;
@@ -128,7 +129,12 @@ public class RunManager {
         exe.Description = exe.TestCase;
         exe.PlatformValue = step.getPlatform();
         exe.Platform = getPlatform(exe.PlatformValue);
-        exe.BrowserName = step.getBrowser();
+        String browser = RunManager.getGlobalSettings().getBrowser();
+        if (browser != null && !(browser.equals("")) && LookUp.cliflag == true) {
+            exe.BrowserName = browser;
+        } else {
+            exe.BrowserName = step.getBrowser();
+        }
         exe.Browser = Browser.fromString(exe.BrowserName);
         exe.BrowserVersionValue = step.getBrowserVersion();
         exe.BrowserVersion = getBrowserVersion(exe.BrowserVersionValue);
@@ -183,8 +189,8 @@ public class RunManager {
     static Platform getPlatform(String platform) {
         if (platform != null && !platform.trim().isEmpty()) {
             if (platform.contains("WIN8_1")) {
-				return Platform.fromString("WIN8.1");
-			}
+                return Platform.fromString("WIN8.1");
+            }
             if (platform.contains("_")) {
                 platform = platform.replace("_", " ");
                 return Platform.fromString(platform.toUpperCase());

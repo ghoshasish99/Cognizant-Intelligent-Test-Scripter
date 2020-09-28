@@ -36,6 +36,8 @@ public class ProjectSettings {
     private final MailSettings mailSettings;
     
     private final DatabaseSettings dbSettings;
+    
+    private final ReportPortalSettings rpSettings;
 
     private final ExecutionSettings execSettings;
 
@@ -49,6 +51,7 @@ public class ProjectSettings {
         this.execSettings = new ExecutionSettings(getLocation());
         this.mailSettings = new MailSettings(getLocation());
         this.dbSettings = new DatabaseSettings(getLocation());
+        this.rpSettings = new ReportPortalSettings(getLocation());
     }
 
     public void resetLocation() {
@@ -60,6 +63,8 @@ public class ProjectSettings {
         execSettings.setLocation(getLocation());
         mailSettings.setLocation(getLocation());
         dbSettings.setLocation(getLocation());
+        rpSettings.setLocation(getLocation());
+               
     }
 
     public final String getLocation() {
@@ -76,6 +81,10 @@ public class ProjectSettings {
     
     public DatabaseSettings getDatabaseSettings(){
         return dbSettings;
+    }
+    
+    public ReportPortalSettings getRPSettings(){
+        return rpSettings;
     }
     
     public DriverSettings getDriverSettings() {

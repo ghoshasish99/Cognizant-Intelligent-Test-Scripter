@@ -34,7 +34,7 @@ import org.apache.commons.cli.ParseException;
 public class LookUp {
 
     private static final Logger LOG = Logger.getLogger(LookUp.class.getName());
-
+    public static boolean cliflag= false;
     public static final Options OPTIONS = new Options();
     private static final Map<String, Option> DO_LATER = new HashMap<>();
     private static final Map<String, Option> EXECUTION = new HashMap<>();
@@ -94,7 +94,7 @@ public class LookUp {
     public static void exe(String[] args) {
         try {
             CommandLineParser parser = new DefaultParser();
-
+            cliflag = true;
             CommandLine cmd = parser.parse(OPTIONS, args);
             for (Option op : cmd.getOptions()) {
 

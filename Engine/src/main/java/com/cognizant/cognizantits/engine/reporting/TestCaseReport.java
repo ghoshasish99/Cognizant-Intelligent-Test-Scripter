@@ -26,6 +26,7 @@ import com.cognizant.cognizantits.engine.reporting.util.DateTimeUtils;
 import com.cognizant.cognizantits.engine.support.Status;
 import com.cognizant.cognizantits.engine.support.Step;
 import com.cognizant.cognizantits.engine.support.methodInf.MethodInfoManager;
+import com.cognizant.cognizantits.engine.reporting.impl.rp.RPTestCaseHandler;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +57,7 @@ public final class TestCaseReport implements Report {
         ++tcCount;
         startTime = new DateTimeUtils();
         handlers = new ArrayList<>();
+        register(new RPTestCaseHandler(this), true);
         register(new HtmlTestCaseHandler(this), true);
     }
 
@@ -241,6 +243,20 @@ public final class TestCaseReport implements Report {
                 + DateTimeUtils.TimeNowForFolder()
                 + ".png";
     }
+    
+  
+    public String getPdfResultName() {
+        return 
+                Scenario
+                + "_"
+                + TestCase
+                + "_Step-"
+                + stepNo + "_"
+               
+                + DateTimeUtils.TimeNowForFolder()
+                + ".pdf";
+    }
+  
 
     @Override
     public File getReportLoc() {

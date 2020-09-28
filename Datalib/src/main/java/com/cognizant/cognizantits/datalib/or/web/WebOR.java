@@ -82,7 +82,7 @@ public class WebOR implements ORRootInf<WebORPage> {
         this.name = name;
     }
 
-    @Override
+    @Override 
     public List<WebORPage> getPages() {
         return pages;
     }

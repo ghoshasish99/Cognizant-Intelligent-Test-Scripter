@@ -53,7 +53,7 @@ public class InputRenderer extends AbstractRenderer {
                 } else {
                     setNotPresent(comp, testDataNotPresent);
                 }
-            } else if (isInputValid(value)) {
+            } else if (isInputValid(value)|| step.getAction().contains("protractor")) {
                 setDefault(comp);
             } else {
                 setNotPresent(comp, inValidInput);

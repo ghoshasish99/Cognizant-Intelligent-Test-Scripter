@@ -21,7 +21,6 @@ import com.cognizant.cognizantits.datalib.settings.testmgmt.Option;
 import com.cognizant.cognizantits.engine.core.TMIntegration;
 import com.cognizant.cognizantits.engine.mail.Mailer;
 import com.cognizant.cognizantits.engine.reporting.sync.Sync;
-import com.cognizant.cognizantits.ide.main.help.Help;
 import com.cognizant.cognizantits.ide.main.mainui.AppMainFrame;
 import com.cognizant.cognizantits.ide.main.utils.ConnectButton;
 import com.cognizant.cognizantits.ide.main.utils.table.XTable;
@@ -29,7 +28,6 @@ import com.cognizant.cognizantits.ide.main.utils.table.XTablePanel;
 import com.cognizant.cognizantits.ide.settings.IconSettings;
 import com.cognizant.cognizantits.ide.util.Notification;
 import com.cognizant.cognizantits.ide.util.Utility;
-import com.cognizant.cognizantits.util.encryption.Encryption;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.sql.DriverManager;
@@ -72,13 +70,15 @@ public class CognizantITSSettings extends javax.swing.JFrame {
     private XTablePanel mailSettingsPanel;
 
     private XTablePanel databaseSettingsPanel;
+    
+    private XTablePanel rpSettingsPanel;
 
     private XTablePanel uDPanel;
 
     private ConnectButton mailConnect;
 
     private ConnectButton dbConnect;
-
+    
     public CognizantITSSettings(AppMainFrame sMainFrame) {
         this.sMainFrame = sMainFrame;
         initComponents();
@@ -93,21 +93,23 @@ public class CognizantITSSettings extends javax.swing.JFrame {
         runSettingsTab.addTab("Mail Settings", mailSettingsPanel);
         databaseSettingsPanel = new XTablePanel(true);
         runSettingsTab.addTab("Database Settings", databaseSettingsPanel);
+        rpSettingsPanel= new XTablePanel(true);
+        runSettingsTab.addTab("ReportPortal Settings", rpSettingsPanel);
 
         mailConnect = new ConnectButton() {
             @Override
             public void actionPerformed(ActionEvent ae) {
                 try {
-                    if (Mailer.connect(PropUtils.getPropertiesFromTable(((XTablePanel) mailSettingsPanel).table))) {
-                        success();
-                    }
+//                    if (Mailer.connect(PropUtils.getPropertiesFromTable(((XTablePanel) mailSettingsPanel).table))) {
+//                        success();
+//                    }
                 } catch (Exception ex) {
                     Logger.getLogger(CognizantITSSettings.class.getName()).log(Level.SEVERE, null, ex);
                     failure();
                 }
             }
         };
-
+        
         dbConnect = new ConnectButton() {
             @Override
             public void actionPerformed(ActionEvent ae) {
@@ -165,6 +167,7 @@ public class CognizantITSSettings extends javax.swing.JFrame {
         loadTestSetTMSettings();
         loadMailSettings();
         loadDBSettings();
+        loadRPSettings();
         showSettings();
     }
 
@@ -190,6 +193,7 @@ public class CognizantITSSettings extends javax.swing.JFrame {
                 .getUserDefinedSettings(), uDPanel.table);
         loadMailSettings();
         loadDBSettings();
+        loadRPSettings();
     }
 
     private void loadRunSettings() {
@@ -215,6 +219,9 @@ public class CognizantITSSettings extends javax.swing.JFrame {
         bddReport.setSelected(execSettings.getRunSettings().isBddReportEnabled());
         sendMail.setSelected(execSettings.getRunSettings().isMailSend());
         excelReporting.setSelected(execSettings.getRunSettings().isExcelReport());
+        rpUpdate.setSelected(execSettings.getRunSettings().isRPUpdate());
+        slackNotify.setSelected(execSettings.getRunSettings().isSendNotification());
+
         /**
          * loading environments
          */
@@ -252,6 +259,12 @@ public class CognizantITSSettings extends javax.swing.JFrame {
                 mailSettingsPanel.table);
         mailConnect.reset();
     }
+    
+    private void loadRPSettings() {
+        PropUtils.loadPropertiesInTable(
+                sProject.getProjectSettings().getRPSettings(),
+                rpSettingsPanel.table);
+    }
 
     private void loadDBSettings() {
         PropUtils.loadPropertiesInTable(
@@ -283,6 +296,8 @@ public class CognizantITSSettings extends javax.swing.JFrame {
         execSettings.getRunSettings().setBddReport(bddReport.isSelected());
         execSettings.getRunSettings().setMailSend(sendMail.isSelected());
         execSettings.getRunSettings().setExcelReport(excelReporting.isSelected());
+        execSettings.getRunSettings().setRPUpdate(rpUpdate.isSelected());
+        execSettings.getRunSettings().setSlackNotification(slackNotify.isSelected());
         execSettings.getRunSettings().setTestEnv(testEnv.getSelectedItem().toString());
         execSettings.getRunSettings().save();
         sMainFrame.reloadSettings();
@@ -362,7 +377,14 @@ public class CognizantITSSettings extends javax.swing.JFrame {
         sProject.getProjectSettings().getDatabaseSettings().set(properties);
         sProject.getProjectSettings().getDatabaseSettings().save();
     }
-
+    
+    private void saveRPSettings() {
+        Properties properties = encryptpassword(PropUtils.getPropertiesFromTable(((XTablePanel) rpSettingsPanel).table), " Enc");
+        PropUtils.loadPropertiesInTable(properties, rpSettingsPanel.table, "");
+        sProject.getProjectSettings().getRPSettings().set(properties);
+        sProject.getProjectSettings().getRPSettings().save();
+    }
+    
     public void saveAll() {
         saveRunSettings();
         saveTestSetTMSettings();
@@ -370,6 +392,7 @@ public class CognizantITSSettings extends javax.swing.JFrame {
         saveuserDefinedSettings();
         saveMailSettings();
         saveDBSettings();
+        saveRPSettings();
     }
 
     private void loadTMTestSetSettings(String module) {
@@ -442,6 +465,8 @@ public class CognizantITSSettings extends javax.swing.JFrame {
         bddReport = new javax.swing.JCheckBox();
         sendMail = new javax.swing.JCheckBox();
         excelReporting = new javax.swing.JCheckBox();
+        slackNotify = new javax.swing.JCheckBox();
+        rpUpdate = new javax.swing.JCheckBox();
         qcrunSettings = new javax.swing.JPanel();
         jScrollPane5 = new javax.swing.JScrollPane();
         tsTMTable = new XTable();
@@ -592,6 +617,16 @@ public class CognizantITSSettings extends javax.swing.JFrame {
         excelReporting.setText("Excel Reporting");
         excelReporting.setToolTipText("Excel Reporting");
 
+        slackNotify.setText("Slack Notification");
+        slackNotify.setToolTipText("Send notification to slack");
+        slackNotify.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                slackNotifyActionPerformed(evt);
+            }
+        });
+
+        rpUpdate.setText("Report Portal");
+
         javax.swing.GroupLayout globalSettingsLayout = new javax.swing.GroupLayout(globalSettings);
         globalSettings.setLayout(globalSettingsLayout);
         globalSettingsLayout.setHorizontalGroup(
@@ -599,6 +634,7 @@ public class CognizantITSSettings extends javax.swing.JFrame {
             .addGroup(globalSettingsLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(globalSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(excelReporting)
                     .addComponent(jLabel29)
                     .addComponent(envLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(globalSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -640,18 +676,23 @@ public class CognizantITSSettings extends javax.swing.JFrame {
                                     .addGap(6, 6, 6)
                                     .addComponent(reRunNo, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                    .addComponent(jLabel30))))
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, globalSettingsLayout.createSequentialGroup()
-                            .addGap(4, 4, 4)
-                            .addGroup(globalSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(reportPerformanceLog)
+                                    .addComponent(jLabel30)))))
+                    .addGroup(globalSettingsLayout.createSequentialGroup()
+                        .addGroup(globalSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(globalSettingsLayout.createSequentialGroup()
+                                .addComponent(rpUpdate)
+                                .addGap(48, 48, 48))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, globalSettingsLayout.createSequentialGroup()
                                 .addComponent(useExistingDriver, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(excelReporting))
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(globalSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(sendMail)
-                                .addComponent(bddReport)))))
-                .addContainerGap(105, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
+                        .addGroup(globalSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(bddReport)
+                            .addComponent(sendMail))
+                        .addGap(2, 2, 2)
+                        .addGroup(globalSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(slackNotify)
+                            .addComponent(reportPerformanceLog))))
+                .addContainerGap(32, Short.MAX_VALUE))
         );
         globalSettingsLayout.setVerticalGroup(
             globalSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -678,7 +719,7 @@ public class CognizantITSSettings extends javax.swing.JFrame {
                     .addComponent(jLabel4)
                     .addComponent(jRadioButton1)
                     .addComponent(jRadioButton2))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(globalSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
                     .addComponent(remoteGridURL, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -694,17 +735,19 @@ public class CognizantITSSettings extends javax.swing.JFrame {
                     .addComponent(jLabel29)
                     .addComponent(reRunNo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel30))
-                .addGap(30, 30, 30)
+                .addGap(38, 38, 38)
                 .addGroup(globalSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(useExistingDriver)
-                    .addComponent(sendMail))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(globalSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(bddReport)
+                    .addComponent(sendMail)
                     .addComponent(reportPerformanceLog))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(globalSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(bddReport)
+                    .addComponent(slackNotify)
+                    .addComponent(rpUpdate))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(excelReporting)
-                .addContainerGap(26, Short.MAX_VALUE))
+                .addContainerGap(36, Short.MAX_VALUE))
         );
 
         runSettingsTab.addTab("Run Settings", globalSettings);
@@ -846,6 +889,10 @@ public class CognizantITSSettings extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_resetActionPerformed
 
+    private void slackNotifyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_slackNotifyActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_slackNotifyActionPerformed
+
     private void testConnection(final Sync connection) {
         try {
             if (connection != null) {
@@ -901,10 +948,12 @@ public class CognizantITSSettings extends javax.swing.JFrame {
     private javax.swing.JCheckBox reportPerformanceLog;
     private javax.swing.JButton reset;
     private javax.swing.JButton resetSettings;
+    private javax.swing.JCheckBox rpUpdate;
     private javax.swing.JTabbedPane runSettingsTab;
     private javax.swing.JPanel savePanel;
     private javax.swing.JButton saveSettings;
     private javax.swing.JCheckBox sendMail;
+    private javax.swing.JCheckBox slackNotify;
     private javax.swing.JButton testConn;
     private javax.swing.JComboBox<String> testEnv;
     private javax.swing.JComboBox testMgmtModuleCombo;

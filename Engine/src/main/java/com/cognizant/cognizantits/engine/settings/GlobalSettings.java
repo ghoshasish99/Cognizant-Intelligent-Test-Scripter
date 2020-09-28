@@ -47,6 +47,7 @@ public class GlobalSettings extends AbstractPropSettings {
         setProjectName(testSet.getProject().getName());
         setRelease(testSet.getRelease().getName());
         setTestSet(testSet.getName());
+        //setRPUpdate(true);
         save();
     }
 
@@ -112,6 +113,14 @@ public class GlobalSettings extends AbstractPropSettings {
 
     public void setTestSet(String value) {
         setProperty("TestSet", value);
+    }
+    
+    public Boolean isRPUpdate() {
+        return Boolean.valueOf(getProperty("ReportPortal", "false"));
+    }
+    
+    public void setRPUpdate(Boolean value) {
+    	setProperty("ReportPortal", String.valueOf(value));
     }
 
 }

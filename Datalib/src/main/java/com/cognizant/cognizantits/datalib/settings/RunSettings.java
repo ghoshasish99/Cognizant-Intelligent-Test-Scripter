@@ -140,4 +140,20 @@ public class RunSettings extends AbstractPropSettings {
     public void setExcelReport(Boolean value) {
         setProperty("excelReport", String.valueOf(value));
     }
+    
+    public Boolean isRPUpdate() {
+        return Boolean.valueOf(getProperty("ReportPortal", "false"));
+    }
+
+    public void setRPUpdate(Boolean value) {
+        setProperty("ReportPortal", String.valueOf(value));
+    }
+    
+    public Boolean isSendNotification(){
+        return Boolean.valueOf(getProperty("slacknotify", "false"));
+    }
+    
+    public void setSlackNotification(Boolean value) {
+        setProperty("slacknotify", String.valueOf(value));
+    }
 }

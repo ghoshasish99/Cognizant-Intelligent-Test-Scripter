@@ -21,6 +21,7 @@ import com.cognizant.cognizantits.engine.reporting.sync.Sync;
 import com.cognizant.cognizantits.engine.reporting.sync.Unknown;
 import com.cognizant.cognizantits.engine.reporting.sync.jira.JIRASync;
 import com.cognizant.cognizantits.engine.reporting.sync.jiracloud.JIRACloudSync;
+import com.cognizant.cognizantits.engine.reporting.sync.octane.OctaneSync;
 import com.cognizant.cognizantits.engine.reporting.sync.qc.QCSync;
 import com.cognizant.cognizantits.engine.reporting.sync.qc.rest.QCRestSync;
 import com.cognizant.cognizantits.engine.reporting.sync.qtest.QTestSync;
@@ -73,6 +74,8 @@ public class TMIntegration {
                 	return new JIRACloudSync(decryptValues(testMgmgtSettings));
                 case "TestRail":
                 	return new TestRailSync(decryptValues(testMgmgtSettings));
+                case "Octane":
+                	return new OctaneSync(decryptValues(testMgmgtSettings));
                 default:
                     LOG.warn("Initializing TM integration with Unknown - " + testMgmgtSettings.getUpdateResultsToTM());
                     return new Unknown();

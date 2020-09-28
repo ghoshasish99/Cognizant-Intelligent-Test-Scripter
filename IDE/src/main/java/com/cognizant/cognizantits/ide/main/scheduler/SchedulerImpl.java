@@ -86,7 +86,7 @@ public abstract class SchedulerImpl implements Scheduler {
     @Override
     public boolean exeCommand(String cmd) {
         try {
-            LOG.info("Executing Task\n" + cmd);
+            LOG.info("Executing Task \n" + cmd);
             Process sProcess = sRuntime.exec(cmd);
             printOutput(sProcess);
             sProcess.waitFor();

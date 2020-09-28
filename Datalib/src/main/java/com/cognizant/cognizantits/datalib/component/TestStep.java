@@ -306,4 +306,30 @@ public class TestStep {
     public Boolean isDatabaseStep() {
         return getObject().equals("Database");
     }
+	
+	public Boolean isWebserviceStep() {
+        return getObject().equals("Webservice");
+    }
+
+    public Boolean isWebserviceRequestStep() {
+        String requests[] = new String[]{"get", "delete", "post", "put"};
+        boolean isWebserviceRequestStep = false;
+        if (getObject().equals("Webservice")) {
+            for (String request : requests) {
+                if (getAction().contains(request)) {
+                    isWebserviceRequestStep = true;
+                    break;
+                }
+            }
+        }
+        return isWebserviceRequestStep;
+    }
+
+    public Boolean isWebserviceStartStep() {
+        return (getObject().equals("Webservice") && getAction().contains("setEndPoint"));
+    }
+
+    public Boolean isWebserviceStopStep() {
+        return (getObject().equals("Webservice") && getAction().contains("closeConnection"));
+    }
 }

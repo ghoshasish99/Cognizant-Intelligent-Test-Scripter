@@ -62,7 +62,7 @@ public class CLI {
         } else {
             /*
             * handle as a flag if it doesn't match key=var
-            */
+             */
             SystemDefaults.CLVars.put(val, "true");
         }
     }
@@ -113,6 +113,11 @@ public class CLI {
         if (execution.containsKey(Op.RS_NAME)) {
             gSettings.setRelease(execution.get(Op.RS_NAME).getValue());
             gSettings.setTestSet(execution.get(Op.TS_NAME).getValue());
+            if (execution.containsKey(Op.BROWSER_NAME)) {
+                gSettings.setBrowser(execution.get(Op.BROWSER_NAME).getValue());
+            } else {
+                gSettings.setBrowser("");
+            }
             gSettings.setTestRun(false);
         } else {
             gSettings.setScenario(execution.get(Op.SC_NAME).getValue());
