@@ -103,7 +103,7 @@ public class ActionRenderer extends AbstractRenderer {
                 valid = MethodInfoManager.getMethodListFor(ObjectType.PROTRACTORJS)
                         .contains(action);
                 break;
-			case "Webservice":
+	    case "Webservice":
                 valid = MethodInfoManager.getMethodListFor(ObjectType.WEBSERVICE)
                         .contains(action);
                 break;	
